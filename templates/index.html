@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube QA Chatbot</title>
+    <style>
+        body {
+            background: #181818;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #232323;
+            padding: 2rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 32px #000a;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 300px;
+            padding: 0.7rem;
+            border-radius: 6px;
+            border: none;
+            margin-bottom: 1rem;
+            background: #333;
+            color: #fff;
+        }
+        button {
+            padding: 0.7rem 2rem;
+            border-radius: 6px;
+            border: none;
+            background: #ff5252;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #ff1744;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>YouTube QA Chatbot</h1>
+        <form action="/set_video" method="post">
+            <input type="text" name="yt_link" placeholder="Enter YouTube video link" required />
+            <br>
+            <button type="submit">Start Chat</button>
+        </form>
+    </div>
+</body>
+</html> 

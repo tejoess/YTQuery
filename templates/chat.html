@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YouTube QA Chatbot</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      overflow: hidden;
+    }
+
+    .main {
+      display: flex;
+      height: 100vh;
+    }
+
+    .video-section {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(35, 35, 35, 0.9);
+      border-right: 2px solid #1f1f1f;
+      backdrop-filter: blur(8px);
+    }
+
+    .chat-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+      background: rgba(24, 24, 24, 0.85);
+    }
+
+    .chat-header {
+      padding: 1.2rem;
+      font-size: 1.5rem;
+      background: linear-gradient(to right, #ff416c, #ff4b2b);
+      color: white;
+      text-align: center;
+      font-weight: bold;
+      border-bottom: 1px solid #222;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 1rem 2rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 1rem 1.4rem;
+      border-radius: 24px;
+      font-size: 1rem;
+      word-break: break-word;
+      line-height: 1.5;
+      animation: fadeIn 0.4s ease-in-out;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #2193b0, #6dd5ed);
+      color: #fff;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 1rem 2rem;
+      background: rgba(35, 35, 35, 0.95);
+      border-top: 1px solid #333;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      border-radius: 24px;
+      border: none;
+      background: #2d2d2d;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .chat-input input:focus {
+      box-shadow: 0 0 10px #ff4b2b;
+    }
+
+    .chat-input button {
+      margin-left: 1rem;
+      padding: 0.8rem 2rem;
+      border-radius: 24px;
+      border: none;
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 0 10px #ff4b2b80;
+    }
+
+    .chat-input button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ff4b2bcc;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    iframe {
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      transition: all 0.4s ease;
+    }
+
+    iframe:hover {
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body>
+  <div class="main">
+    <div class="video-section">
+      {% if yt_link %}
+      <iframe id="ytplayer" width="480" height="270" frameborder="0" allowfullscreen
+        src="https://www.youtube.com/embed/{{ yt_link.split('v=')[-1] if 'v=' in yt_link else yt_link.split('/')[-1] }}">
+      </iframe>
+      {% else %}
+      <p>No video selected.</p>
+      {% endif %}
+    </div>
+    <div class="chat-section">
+      <div class="chat-header">Chat with YouTube QA Bot</div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <form class="chat-input" id="chat-form" autocomplete="off">
+        <input type="text" id="user-input" placeholder="Ask a question..." required />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const chatMessages = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+
+    function appendMessage(content, sender) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message ' + sender;
+      msgDiv.textContent = content;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = userInput.value.trim();
+      if (!message) return;
+      appendMessage(message, 'user');
+      userInput.value = '';
+      appendMessage('...', 'bot');
+      const botMsgDiv = chatMessages.lastChild;
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+        const data = await response.json();
+        botMsgDiv.textContent = data.answer;
+      } catch (err) {
+        botMsgDiv.textContent = 'Error: Could not get answer.';
+      }
+    });
+  </script>
+</body>
+</html>
