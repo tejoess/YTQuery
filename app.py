@@ -75,5 +75,10 @@ def chat_post():
 
     return jsonify({'answer': response})
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route("/")
+def home():
+    return "Hello from YTQuery!"
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))  # default to 5000 locally
+    app.run(host="0.0.0.0", port=port)
